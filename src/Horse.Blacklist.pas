@@ -81,12 +81,12 @@ end;
 
 constructor THorseBlackListMiddleware.Create;
 begin
-  FMaxAttempts := 0; // Valor padr„o zero, permitindo todos os IPs sem bloqueio
+  FMaxAttempts := 0; // Valor padr√£o zero, permitindo todos os IPs sem bloqueio
   FBlackList := TDictionary<string, Integer>.Create;
   FAllowedIPs := TList<string>.Create;
   FLock := TCriticalSection.Create;
   FAllowedIPs.Add('127.0.0.1'); // Adiciona o IP local como sempre permitido
-  FEnableConsoleLog := False; // Desativa o log no console por padr„o
+  FEnableConsoleLog := False; // Desativa o log no console por padr√£o
 end;
 
 destructor THorseBlackListMiddleware.Destroy;
@@ -195,7 +195,7 @@ begin
       AttemptCount: Integer;
       LAccessTime: TDateTime;
     begin
-      // Se o FMaxAttempts for zero, permite todas as requisiÁıes
+      // Se o FMaxAttempts for zero, permite todas as requisi√ß√µes
       if FMaxAttempts = 0 then
       begin
         Next;
@@ -281,169 +281,3 @@ begin
 end;
 
 end.
-
-
-
-
-(*
-  interface
-
-  uses
-  Horse,
-  System.SysUtils,
-  System.Classes,
-  System.Generics.Collections,
-  System.SyncObjs,
-  System.IOUtils,
-  Horse.Commons;
-
-  type
-  THorseBlackListMiddleware = class;
-
-  TAllowedIPManager = class
-  private
-  FMiddleware: THorseBlackListMiddleware;
-  public
-  constructor Create(AMiddleware: THorseBlackListMiddleware);
-  function Add(const AIP: string): TAllowedIPManager;
-  function &End: THorseBlackListMiddleware;
-  end;
-
-  THorseBlackListMiddleware = class
-  private
-  FMaxAttempts: Integer;
-  FBlackList: TDictionary<string, Integer>;
-  FAllowedIPs: TList<string>;
-  FLock: TCriticalSection;
-  FLogFile: string;
-  public
-  constructor Create;
-  destructor Destroy; override;
-  procedure Register;
-
-  function SetLogFile(const AFileName: string): THorseBlackListMiddleware;
-  function SetMaxAttempts(Value: Integer): THorseBlackListMiddleware;
-  function SetAllowedIP: TAllowedIPManager; // Retorna o gerenciador de IPs permitidos
-
-  function HorseCallback: THorseCallback;
-  class function New: THorseBlackListMiddleware;
-  end;
-
-  implementation
-
-  { TAllowedIPManager }
-
-  constructor TAllowedIPManager.Create(AMiddleware: THorseBlackListMiddleware);
-  begin
-  FMiddleware := AMiddleware;
-  end;
-
-  function TAllowedIPManager.Add(const AIP: string): TAllowedIPManager;
-  begin
-  FMiddleware.FAllowedIPs.Add(AIP);
-  Result := Self;
-  end;
-
-  function TAllowedIPManager.&End: THorseBlackListMiddleware;
-  begin
-  Result := FMiddleware;
-  end;
-
-  { THorseBlackListMiddleware }
-
-  constructor THorseBlackListMiddleware.Create;
-  begin
-  FMaxAttempts := 5;
-  FBlackList := TDictionary<string, Integer>.Create;
-  FAllowedIPs := TList<string>.Create;
-  FLock := TCriticalSection.Create;
-  end;
-
-  destructor THorseBlackListMiddleware.Destroy;
-  begin
-  FBlackList.Free;
-  FAllowedIPs.Free;
-  FLock.Free;
-  inherited;
-  end;
-
-  function THorseBlackListMiddleware.SetLogFile(const AFileName: string): THorseBlackListMiddleware;
-  begin
-  FLogFile := AFileName;
-  Result := Self;
-  end;
-
-  function THorseBlackListMiddleware.SetMaxAttempts(Value: Integer): THorseBlackListMiddleware;
-  begin
-  FMaxAttempts := Value;
-  Result := Self;
-  end;
-
-  function THorseBlackListMiddleware.SetAllowedIP: TAllowedIPManager;
-  begin
-  Result := TAllowedIPManager.Create(Self);
-  end;
-
-  procedure THorseBlackListMiddleware.Register;
-  begin
-  THorse.Use(HorseCallback);
-  end;
-
-  function THorseBlackListMiddleware.HorseCallback: THorseCallback;
-  begin
-  Result :=
-  procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
-  var
-  LIP, LEndpoint, LMethod: string;
-  AttemptCount: Integer;
-  LAccessTime: TDateTime;
-  begin
-  Req.Headers.TryGetValue('X-Forwarded-For', LIP);
-  if LIP.Equals(EmptyStr) then
-  LIP := Req.RawWebRequest.RemoteAddr;
-
-  LEndpoint := Req.RawWebRequest.PathInfo;
-  LMethod := Req.RawWebRequest.Method;
-  LAccessTime := Now;
-
-  FLock.Enter;
-  try
-  if FAllowedIPs.Contains(LIP) then
-  begin
-  Next;
-  Exit;
-  end;
-
-  if FBlackList.ContainsKey(LIP) then
-  AttemptCount := FBlackList[LIP] + 1
-  else
-  AttemptCount := 1;
-
-  FBlackList.AddOrSetValue(LIP, AttemptCount);
-
-  if AttemptCount > FMaxAttempts then
-  begin
-  if FLogFile <> EmptyStr then
-  begin
-  TFile.AppendAllText(FLogFile,
-  Format('Blocked IP: %s [%s] %s %s'#13#10, [LIP, DateTimeToStr(LAccessTime), LEndpoint, LMethod]));
-  end;
-
-  Res.Status(THTTPStatus.Forbidden).Send('Access Denied');
-  raise EHorseCallbackInterrupted.Create;
-  end;
-  finally
-  FLock.Leave;
-  end;
-
-  Next;
-  end;
-  end;
-
-  class function THorseBlackListMiddleware.New: THorseBlackListMiddleware;
-  begin
-  Result := THorseBlackListMiddleware.Create;
-  end;
-
-  end.
-*)
