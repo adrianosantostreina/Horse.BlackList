@@ -15,7 +15,7 @@
 Run the following command in the terminal to install the middleware via Boss:
 
 ```sh
-boss install <middleware-repo-link>
+boss install github.com/adrianosantostreina/Horse.BlackList
 ```
 
 ## Usage
